@@ -6,15 +6,17 @@ function PinList({
     onDeletePin,
     onHover,
     onClearPins,
+    onSelect,
 }: {
     pins: Pin[];
     onDeletePin: (index: number) => void;
     onHover: (index: number | null) => void;
     onClearPins: () => void;
+    onSelect: (pin: Pin) => void;
 }) {
     return (
         <div>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-4 cursor-pointer">
                 { /* Pin List Header */ }
                 <h2 className="text-xl font-bold mb-4">Pin List</h2>
 
@@ -39,9 +41,10 @@ function PinList({
                 ) : (
                     pins.map((pin, index) => (
                         <div
-                            key={index}
+                            key={pin.id}
                             onMouseEnter={() => onHover(index)}
                             onMouseLeave={() => onHover(null)}
+                            onClick={() => onSelect(pin)}
                             className="flex items-center justify-between p-3 border rounded-lg"
                         >
                             { /* Pin Number */}

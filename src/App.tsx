@@ -50,20 +50,32 @@ function App() {
     } 
   };
 
+  // Update a pin's properties by ID (used for updating position and address after dragging)
+  const updatePin = (id: string, updated: Partial<Pin>) => {
+      setPins((prev) =>
+          prev.map((p) =>
+              p.id === id ? { ...p, ...updated } : p
+          )
+      );
+  }; 
 
   // Delete a pin by index
   const deletePin = (index: number) => {
     setPins((prevPins) => prevPins.filter((_, i) => i !== index));
   };
 
+
   // Clear all pins from the list
   const clearPins = () => {
     setPins([]);
   };
 
+
   // Track which pin is currently hovered in the list (by index)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
+  // Related to Flyto functionality 
+  const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
 
   return (
     <div className="relative h-screen w-screen">
@@ -72,6 +84,8 @@ function App() {
         pins={pins}
         onAddPin={addPin}
         hoveredIndex={hoveredIndex}
+        updatePin={updatePin}
+        selectedPin={selectedPin}
       />
 
       { /* Pin List Layer, on top. Responsive layout. */}
@@ -103,6 +117,7 @@ function App() {
             onDeletePin={deletePin}
             onHover={setHoveredIndex}
             onClearPins={clearPins}
+            onSelect={ setSelectedPin}
           />
         </div>
       </div>

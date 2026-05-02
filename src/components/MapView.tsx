@@ -1,8 +1,11 @@
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import mapPinIcon from "../img/MapPin.svg";     // Custom marker icon
 import { Tooltip } from "react-leaflet";
 import { formatToDMS } from "../utils/formatToDMS";
+import { reverseGeocode } from "../services/geocoding";
+import { useMap } from "react-leaflet";
+import { useEffect } from "react";
 
 
 const normalIcon = new L.Icon({
@@ -17,7 +20,7 @@ const hoveredIcon = new L.Icon({
     iconUrl: mapPinIcon,
     iconSize: [40, 40],     // Enlarge the icon when hovered
     iconAnchor: [20, 40],
-});
+}); 
 
 // Component to handle add pins
 function MapClickHandler({ onAddPin }: { onAddPin: (pin: Pin) => void }) {
@@ -30,16 +33,35 @@ function MapClickHandler({ onAddPin }: { onAddPin: (pin: Pin) => void }) {
     return null;
 }
 
+// Component to handle flyTo when a pin is clicked in the list
+function FlyToHandler({ target }: { target: Pin | null }) { 
+    const map = useMap();
+
+    useEffect(() => {
+        if(target) {
+            map.flyTo([target.lat, target.lng], 15, {
+                duration: 1.5,
+            });
+        }
+    }, [target]);  //Only trigger when the target pin changes
+        
+    return null;
+}
+
 
 // Main MapView component
 function MapView({
     pins,
     onAddPin,
     hoveredIndex,
+    updatePin,
+    selectedPin,
 }: {
     pins: Pin[];
     onAddPin: (pin: Pin) => void;
     hoveredIndex: number | null;
+    updatePin: (id: string, updated: Partial<Pin>) => void;
+    selectedPin: Pin | null;
 }) { 
   return (
     <MapContainer
@@ -61,18 +83,49 @@ function MapView({
     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
     /> */}
           
+    {/* FlyTo function */}
+    <FlyToHandler target={selectedPin} />
+    
     {/* Handle map clicks to add pins */}
     <MapClickHandler onAddPin={onAddPin} />
-    
+          
     {/* Render pins as markers */}
           {pins.map((pin, index) => {
               const isHovered = hoveredIndex === index;  // Check if this pin is currently hovered in the list
           
               return (
                 <Marker
-                    key={pin.id}
-                    position={[pin.lat, pin.lng]}
-                    icon={isHovered ? hoveredIcon : normalIcon}  // Use hovered icon if this pin is hovered in the list>
+                      key={pin.id}
+                      position={[pin.lat, pin.lng]}
+                      icon={isHovered ? hoveredIcon : normalIcon}  // Use hovered icon if this pin is hovered in the list>
+                      draggable={ true }  // Allow dragging the marker to update its position
+                      eventHandlers={{      // Handle the drag end event to update the pin's position and fetch new address
+                          dragend: async (e) => {
+                              const marker = e.target;
+                              const position = marker.getLatLng();
+
+                              const newLat = position.lat;
+                              const newLng = position.lng;
+
+                              // Update the pin's position in the parent component
+                              updatePin(pin.id, {
+                                  lat: newLat,
+                                  lng: newLng,
+                                  loading: true,  // Set loading state while fetching new address
+                              });
+
+                              try {
+                                  const address = await reverseGeocode(newLat, newLng);
+
+                                  updatePin(pin.id, {
+                                      address,
+                                      loading: false,  // Clear loading state after fetching address
+                                  });
+                              } catch (err) {
+                                  console.error(err);
+                              }
+                            },
+                      }}
                 >
                 
                     {/* Show tooltip when hovered in the list */}
