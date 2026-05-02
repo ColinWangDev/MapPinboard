@@ -27,18 +27,19 @@ function App() {
   }, [pins]);
 
   // Add a new pin to the list
-  const addPin = async (pin: Pin) => {
+  const addPin = async (lat: number, lng: number) => {
     const id = Date.now().toString();  // Generate a unique ID based on timestamp
     const newPin: Pin = {
-      ...pin,
       id,  // Generate a unique ID based on timestamp
+      lat,
+      lng,
       loading: true,  // Set loading state while fetching address
     };
 
     setPins((prevPins) => [...prevPins, newPin]);
 
     try {
-      const address = await reverseGeocode(pin.lat, pin.lng);
+      const address = await reverseGeocode(lat, lng);
 
       setPins((prev) =>
         prev.map((p) =>
@@ -92,10 +93,10 @@ function App() {
       <div
         className="
           absolute
-          z-[1000]
+          z-1000
 
           /* Desktop &  Mobile-Landscape */
-          md:top-4 md:left-4 md:bottom-4 md:w-[420px] md:h-auto 
+          md:top-4 md:left-4 md:bottom-4 md:w-105 md:h-auto 
 
           /* Mobile-Portrait */
           bottom-0 left-0 right-0 

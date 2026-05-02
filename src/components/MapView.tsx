@@ -6,6 +6,7 @@ import { formatToDMS } from "../utils/formatToDMS";
 import { reverseGeocode } from "../services/geocoding";
 import { useMap } from "react-leaflet";
 import { useEffect } from "react";
+import type { Pin } from "../App";
 
 
 const normalIcon = new L.Icon({
@@ -23,10 +24,14 @@ const hoveredIcon = new L.Icon({
 }); 
 
 // Component to handle add pins
-function MapClickHandler({ onAddPin }: { onAddPin: (pin: Pin) => void }) {
+function MapClickHandler({
+    onAddPin,
+}: {
+    onAddPin: (lat:number, lng: number) => void
+}) {
     useMapEvents({
         click(e) {
-            onAddPin({ lat: e.latlng.lat, lng: e.latlng.lng });
+            onAddPin(e.latlng.lat, e.latlng.lng);
         },
     });
     
@@ -58,7 +63,7 @@ function MapView({
     selectedPin,
 }: {
     pins: Pin[];
-    onAddPin: (pin: Pin) => void;
+    onAddPin: (lat:number, lng: number) => void;
     hoveredIndex: number | null;
     updatePin: (id: string, updated: Partial<Pin>) => void;
     selectedPin: Pin | null;
@@ -153,7 +158,7 @@ function MapView({
 
                             <div className="
                             bg-white px-3 py-1.5 rounded-lg shadow-xl border border-gray-100 flex flex-col gap-0.5 w-52
-                            max-w-xs break-words whitespace-normal
+                            max-w-xs wrap-break-word whitespace-normal
                         ">
                                 <div className="text-lg font-bold text-gray-800">
                                     Pin #{index + 1}
