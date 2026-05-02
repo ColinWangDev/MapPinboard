@@ -124,13 +124,15 @@ npm run dev
 
 ## Deployment
 
-*(To be added after deployment)*
+Vercel Address:  
+[https://map-pinboard-au3w.vercel.app/](https://map-pinboard-au3w.vercel.app/)
 
 ---
 
 ## Demo
 
-*(To be added after recording)*
+Map Pinboard Demo Video:  
+[(https://youtu.be/G2uic5ODU2s)](https://youtu.be/G2uic5ODU2s)
 
 ---
 
