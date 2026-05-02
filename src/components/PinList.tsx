@@ -9,7 +9,7 @@ function PinList({
     onSelect,
 }: {
     pins: Pin[];
-    onDeletePin: (index: number) => void;
+    onDeletePin: (id: string) => void;
     onHover: (index: number | null) => void;
     onClearPins: () => void;
     onSelect: (pin: Pin) => void;
@@ -70,7 +70,7 @@ function PinList({
                             
                             { /* Delete Button */}
                             <button
-                                onClick={() => onDeletePin(index)}
+                                onClick={() => onDeletePin(pin.id)}
                                 className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-red-500 hover:bg-red-50 cursor-pointer">
                                 🗑
                             </button>

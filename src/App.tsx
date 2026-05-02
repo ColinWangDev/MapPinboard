@@ -60,9 +60,11 @@ function App() {
       );
   }; 
 
-  // Delete a pin by index
-  const deletePin = (index: number) => {
-    setPins((prevPins) => prevPins.filter((_, i) => i !== index));
+  // Delete a pin by id
+  const deletePin = (id: string) => {
+    setPins((prevPins) => prevPins.filter((p) => p.id !== id));
+
+    setSelectedPinId((prevSelectedId) => (prevSelectedId === id ? null : prevSelectedId));  // Clear selection if the deleted pin was selected
   };
 
 
@@ -76,7 +78,10 @@ function App() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   // Related to Flyto functionality 
-  const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
+  const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
+  const selectedPin = pins.find(pin => pin.id === selectedPinId) || null;
+
+  // const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
 
   return (
     <div className="relative h-screen w-screen">
@@ -118,7 +123,7 @@ function App() {
             onDeletePin={deletePin}
             onHover={setHoveredIndex}
             onClearPins={clearPins}
-            onSelect={ setSelectedPin}
+            onSelect={ selectedPin => setSelectedPinId(selectedPin.id) }
           />
         </div>
       </div>
